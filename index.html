@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cache Quest</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🧠 Cache Quest</h1>
+
+  <div id="controls">
+    <label for="cacheType">Cache Type:</label>
+    <select id="cacheType">
+      <option value="direct">Direct-Mapped</option>
+      <option value="set">Set-Associative</option>
+      <option value="full">Fully Associative</option>
+    </select>
+
+    <label for="policy">Replacement Policy:</label>
+    <select id="policy">
+      <option value="fifo">FIFO</option>
+      <option value="lru">LRU</option>
+    </select>
+
+    <button onclick="drawCard()">Draw Card</button>
+    <p id="currentCard">Current Card: None</p>
+  </div>
+
+  <div id="gameBoard">
+    <h2>Memory Board</h2>
+    <div id="memoryGrid"></div>
+  </div>
+
+  <div id="cacheBoard">
+    <h2>Cache</h2>
+    <div id="cacheSlots"></div>
+  </div>
+
+  <div id="stats">
+    <p>Hits: <span id="hits">0</span></p>
+    <p>Misses: <span id="misses">0</span></p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
