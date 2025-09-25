@@ -9,6 +9,9 @@
   <h1>🧠 Cache Quest</h1>
 
   <div id="controls">
+    <label for="cacheSize">Cache Size:</label>
+    <input type="number" id="cacheSize" min="2" max="16" value="4" />
+
     <label for="cacheType">Cache Type:</label>
     <select id="cacheType">
       <option value="direct">Direct-Mapped</option>
@@ -22,6 +25,7 @@
       <option value="lru">LRU</option>
     </select>
 
+    <button onclick="startGame()">Start Game</button>
     <button onclick="drawCard()">Draw Card</button>
     <p id="currentCard">Current Card: None</p>
   </div>
@@ -41,6 +45,12 @@
     <p>Misses: <span id="misses">0</span></p>
   </div>
 
+  <div id="leaderboard">
+    <h2>🏆 Leaderboard</h2>
+    <ul id="leaderboardList"></ul>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
+
