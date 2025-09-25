@@ -1,25 +1,11 @@
 let memorySize = 16;
 let cacheSize = 4;
 let setSize = 2;
-let memory = [];
 let cache = [];
 let hits = 0;
 let misses = 0;
 let accessHistory = [];
 let leaderboard = [];
-
-function initMemory() {
-  memory = [];
-  const grid = document.getElementById("memoryGrid");
-  grid.innerHTML = "";
-  for (let i = 0; i < memorySize; i++) {
-    memory.push(`M${i}`);
-    const cell = document.createElement("div");
-    cell.className = "cell";
-    cell.textContent = `M${i}`;
-    grid.appendChild(cell);
-  }
-}
 
 function initCache() {
   cache = Array(cacheSize).fill(null);
@@ -33,6 +19,7 @@ function initCache() {
     slot.textContent = "Empty";
     grid.appendChild(slot);
   }
+  document.getElementById("accessList").innerHTML = "";
 }
 
 function startGame() {
@@ -42,7 +29,6 @@ function startGame() {
   misses = 0;
   document.getElementById("hits").textContent = hits;
   document.getElementById("misses").textContent = misses;
-  initMemory();
   initCache();
 }
 
@@ -126,15 +112,20 @@ function drawCard() {
 
   if (hit) hits++;
   else misses++;
-  updateStats();
+  updateStats(address, hit);
 }
 
-function updateStats() {
+function updateStats(address, hit) {
   document.getElementById("hits").textContent = hits;
   document.getElementById("misses").textContent = misses;
 
   const total = hits + misses;
   const ratio = total ? (hits / total).toFixed(2) : 0;
+
+  const accessList = document.getElementById("accessList");
+  const item = document.createElement("li");
+  item.textContent = `${address} → ${hit ? "Hit ✅" : "Miss ❌"}`;
+  accessList.appendChild(item);
 
   leaderboard.push({ name: `Player ${leaderboard.length + 1}`, ratio });
   leaderboard.sort((a, b) => b.ratio - a.ratio);
@@ -150,4 +141,3 @@ function renderLeaderboard() {
     list.appendChild(item);
   });
 }
-
