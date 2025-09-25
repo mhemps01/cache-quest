@@ -8,7 +8,7 @@ body {
   margin: 20px;
 }
 
-#memoryGrid, #cacheSlots {
+#cacheSlots {
   display: grid;
   grid-template-columns: repeat(4, 60px);
   gap: 10px;
@@ -16,7 +16,7 @@ body {
   margin: 20px;
 }
 
-.cell, .cache-line {
+.cache-line {
   width: 60px;
   height: 60px;
   background-color: #fff;
@@ -27,11 +27,11 @@ body {
   font-weight: bold;
 }
 
-#leaderboard {
+#stats, #accessLog, #leaderboard {
   margin-top: 30px;
 }
 
-#leaderboardList {
+#accessList, #leaderboardList {
   list-style: none;
   padding: 0;
 }
