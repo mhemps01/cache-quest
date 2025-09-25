@@ -26,3 +26,12 @@ body {
   justify-content: center;
   font-weight: bold;
 }
+
+#leaderboard {
+  margin-top: 30px;
+}
+
+#leaderboardList {
+  list-style: none;
+  padding: 0;
+}
