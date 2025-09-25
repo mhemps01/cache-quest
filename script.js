@@ -141,3 +141,4 @@ function renderLeaderboard() {
     list.appendChild(item);
   });
 }
+
