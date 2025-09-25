@@ -1,37 +1,153 @@
-body {
-  font-family: sans-serif;
-  text-align: center;
-  background-color: #f0f4f8;
+let memorySize = 16;
+let cacheSize = 4;
+let setSize = 2;
+let memory = [];
+let cache = [];
+let hits = 0;
+let misses = 0;
+let accessHistory = [];
+let leaderboard = [];
+
+function initMemory() {
+  memory = [];
+  const grid = document.getElementById("memoryGrid");
+  grid.innerHTML = "";
+  for (let i = 0; i < memorySize; i++) {
+    memory.push(`M${i}`);
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    cell.textContent = `M${i}`;
+    grid.appendChild(cell);
+  }
 }
 
-#controls {
-  margin: 20px;
+function initCache() {
+  cache = Array(cacheSize).fill(null);
+  accessHistory = Array(Math.ceil(cacheSize / setSize)).fill(null).map(() => []);
+  const grid = document.getElementById("cacheSlots");
+  grid.innerHTML = "";
+  for (let i = 0; i < cacheSize; i++) {
+    const slot = document.createElement("div");
+    slot.className = "cache-line";
+    slot.id = `cache-${i}`;
+    slot.textContent = "Empty";
+    grid.appendChild(slot);
+  }
 }
 
-#memoryGrid, #cacheSlots {
-  display: grid;
-  grid-template-columns: repeat(4, 60px);
-  gap: 10px;
-  justify-content: center;
-  margin: 20px;
+function startGame() {
+  cacheSize = parseInt(document.getElementById("cacheSize").value);
+  setSize = cacheSize >= 4 ? 2 : 1;
+  hits = 0;
+  misses = 0;
+  document.getElementById("hits").textContent = hits;
+  document.getElementById("misses").textContent = misses;
+  initMemory();
+  initCache();
 }
 
-.cell, .cache-line {
-  width: 60px;
-  height: 60px;
-  background-color: #fff;
-  border: 2px solid #333;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
+function drawCard() {
+  const cardIndex = Math.floor(Math.random() * memorySize);
+  const address = `M${cardIndex}`;
+  document.getElementById("currentCard").textContent = `Current Card: ${address}`;
+
+  const cacheType = document.getElementById("cacheType").value;
+  const policy = document.getElementById("policy").value;
+
+  let hit = false;
+
+  if (cacheType === "direct") {
+    const index = cardIndex % cacheSize;
+    if (cache[index] === address) {
+      hit = true;
+    } else {
+      cache[index] = address;
+      document.getElementById(`cache-${index}`).textContent = address;
+    }
+  }
+
+  else if (cacheType === "set") {
+    const numSets = Math.floor(cacheSize / setSize);
+    const setIndex = cardIndex % numSets;
+    const setStart = setIndex * setSize;
+    const setEnd = setStart + setSize;
+    const set = cache.slice(setStart, setEnd);
+    const history = accessHistory[setIndex];
+
+    const pos = set.indexOf(address);
+    if (pos !== -1) {
+      hit = true;
+      if (policy === "lru") {
+        history.splice(history.indexOf(address), 1);
+        history.push(address);
+      }
+    } else {
+      if (set.includes(null)) {
+        const emptyIndex = set.indexOf(null);
+        cache[setStart + emptyIndex] = address;
+        document.getElementById(`cache-${setStart + emptyIndex}`).textContent = address;
+        history.push(address);
+      } else {
+        const evicted = history[0];
+        const evictPos = set.indexOf(evicted);
+        cache[setStart + evictPos] = address;
+        document.getElementById(`cache-${setStart + evictPos}`).textContent = address;
+        history.shift();
+        history.push(address);
+      }
+    }
+  }
+
+  else if (cacheType === "full") {
+    const pos = cache.indexOf(address);
+    const history = accessHistory[0];
+    if (pos !== -1) {
+      hit = true;
+      if (policy === "lru") {
+        history.splice(history.indexOf(address), 1);
+        history.push(address);
+      }
+    } else {
+      if (cache.includes(null)) {
+        const emptyIndex = cache.indexOf(null);
+        cache[emptyIndex] = address;
+        document.getElementById(`cache-${emptyIndex}`).textContent = address;
+        history.push(address);
+      } else {
+        const evicted = history[0];
+        const evictPos = cache.indexOf(evicted);
+        cache[evictPos] = address;
+        document.getElementById(`cache-${evictPos}`).textContent = address;
+        history.shift();
+        history.push(address);
+      }
+    }
+  }
+
+  if (hit) hits++;
+  else misses++;
+  updateStats();
 }
 
-#leaderboard {
-  margin-top: 30px;
+function updateStats() {
+  document.getElementById("hits").textContent = hits;
+  document.getElementById("misses").textContent = misses;
+
+  const total = hits + misses;
+  const ratio = total ? (hits / total).toFixed(2) : 0;
+
+  leaderboard.push({ name: `Player ${leaderboard.length + 1}`, ratio });
+  leaderboard.sort((a, b) => b.ratio - a.ratio);
+  renderLeaderboard();
 }
 
-#leaderboardList {
-  list-style: none;
-  padding: 0;
+function renderLeaderboard() {
+  const list = document.getElementById("leaderboardList");
+  list.innerHTML = "";
+  leaderboard.slice(0, 5).forEach(player => {
+    const item = document.createElement("li");
+    item.textContent = `${player.name}: Hit Ratio ${player.ratio}`;
+    list.appendChild(item);
+  });
 }
+
